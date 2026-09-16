@@ -1,7 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ProductosService } from './productos.service.js';
-import type { Producto } from './productos.service.js';
+import { ProductosService, Producto } from './productos.service';
 
 const productoSchema = {
   type: 'object',
