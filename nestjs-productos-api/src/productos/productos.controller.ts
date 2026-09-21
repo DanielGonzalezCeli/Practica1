@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Patch, Delete, Body, Param, ParseIntPipe, Query, HttpCode, HttpStatus, Res } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { ProductosService } from './productos.service';
 import { Response } from 'express'
 import { CrearProductoDto } from './dto/crear-producto.dto';
@@ -44,6 +44,11 @@ export class ProductosController {
 
   @Get()
   @ApiOperation({ summary: 'Listar productos disponibles' })
+  @ApiQuery({
+    name: 'nombre',
+    required: false,
+    description: 'Filtra por nombre (sin distinguir mayúsculas). Si se omite, devuelve todos.',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de productos.',
