@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Put, Patch, Delete, Body, Param, ParseIntPipe, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param, ParseIntPipe, Query, HttpCode, HttpStatus, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ProductosService } from './productos.service';
-import { Producto } from './producto.entity';
 import { Response } from 'express'
 import { CrearProductoDto } from './dto/crear-producto.dto';
 import { ActualizarPrecioDto } from './dto/actualizar-precio.dto';
@@ -50,8 +49,8 @@ export class ProductosController {
     description: 'Lista de productos.',
     schema: { type: 'array', items: productoSchema },
   })
-  findAll(): Producto[] {
-    return this.productosService.findAll();
+  findAll(@Query('nombre') nombre?: string) {
+    return this.productosService.findAll(nombre);
   }
 
   @Get(':id')
@@ -62,8 +61,8 @@ export class ProductosController {
     schema: productoConLinksSchema,
   })
   @ApiResponse({ status: 404, description: 'Producto no encontrado.' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    const producto = this.productosService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const producto = await this.productosService.findOne(id);
     const href = `/api/v1/productos/${producto.id}`;
     return {
       ...producto,
@@ -77,27 +76,27 @@ export class ProductosController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  crear(@Body() dto: CrearProductoDto, @Res({ passthrough: true }) res: Response) {
-    const nuevo = this.productosService.crear(dto);
+  async crear(@Body() dto: CrearProductoDto, @Res({ passthrough: true }) res: Response) {
+    const nuevo = await this.productosService.crear(dto);
     res.setHeader('Location', `/api/v1/productos/${nuevo.id}`);
     return nuevo;
   }
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  reemplazar(@Param('id', ParseIntPipe) id: number, @Body() dto: CrearProductoDto) {
-    this.productosService.reemplazar(id, dto);
+  async reemplazar(@Param('id', ParseIntPipe) id: number, @Body() dto: CrearProductoDto) {
+    await this.productosService.reemplazar(id, dto);
   }
 
   @Patch(':id')
-  actualizarPrecio(@Param('id', ParseIntPipe) id: number, @Body() dto: ActualizarPrecioDto) {
+  async actualizarPrecio(@Param('id', ParseIntPipe) id: number, @Body() dto: ActualizarPrecioDto) {
     return this.productosService.actualizarPrecio(id, dto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  eliminar(@Param('id', ParseIntPipe) id: number) {
-    this.productosService.eliminar(id);
+  async eliminar(@Param('id', ParseIntPipe) id: number) {
+    await this.productosService.eliminar(id);
   }
  
 }
